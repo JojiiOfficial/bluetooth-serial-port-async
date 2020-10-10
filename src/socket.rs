@@ -472,3 +472,60 @@ impl BtDevice {
 pub fn scan_devices(timeout: time::Duration) -> Result<Vec<BtDevice>, BtError> {
     crate::scan_devices(timeout)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str::FromStr;
+
+    #[test]
+    fn btaddr_from_string() {
+        match BtAddr::from_str("00:00:00:00:00:00") {
+            Ok(addr) => assert_eq!(addr, BtAddr([0u8; 6])),
+            Err(_) => panic!(""),
+        }
+
+        let fail_strings = [
+            "addr : String",
+            "00:00:00:00:00",
+            "00:00:00:00:00:00:00",
+            "-00:00:00:00:00:00",
+            "0G:00:00:00:00:00",
+        ];
+        for &s in &fail_strings {
+            match BtAddr::from_str(s) {
+                Ok(_) => panic!("Somehow managed to parse \"{}\" as an address?!", s),
+                Err(_) => (),
+            }
+        }
+    }
+
+    #[test]
+    fn btaddr_to_string() {
+        assert_eq!(BtAddr::any().to_string(), "00:00:00:00:00:00");
+        assert_eq!(BtAddr([1, 2, 3, 4, 5, 6]).to_string(), "01:02:03:04:05:06");
+    }
+
+    #[test]
+    fn btaddr_roundtrips_to_from_str() {
+        let addr = BtAddr([0, 22, 4, 1, 33, 192]);
+        let addr_string = "00:ff:ee:ee:dd:12";
+
+        assert_eq!(addr, BtAddr::from_str(&addr.to_string()).unwrap());
+        assert!(
+            addr_string.eq_ignore_ascii_case(&BtAddr::from_str(addr_string).unwrap().to_string())
+        );
+    }
+
+    #[cfg(not(feature = "test_without_hardware"))]
+    #[test]
+    fn creates_rfcomm_socket() {
+        BtSocket::new(BtProtocol::RFCOMM).unwrap();
+    }
+
+    #[cfg(not(feature = "test_without_hardware"))]
+    #[test]
+    fn scans_devices() {
+        scan_devices(time::Duration::from_secs(20)).unwrap();
+    }
+}
