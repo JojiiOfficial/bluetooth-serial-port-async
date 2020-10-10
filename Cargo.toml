@@ -12,14 +12,17 @@
 
 [package]
 edition = "2018"
-name = "bluetooth-serial-port"
+name = "bluetooth-serial-port-async"
 version = "0.6.0"
-authors = ["Christopher James Halse Rogers <raof@ubuntu.com>", "kaegi <kaegi.dev@gmail.com>", "Evgeniy A. Dushistov <dushistov@mail.ru>"]
+authors = ["Christopher James Halse Rogers <raof@ubuntu.com>", "kaegi <kaegi.dev@gmail.com>", "Evgeniy A. Dushistov <dushistov@mail.ru>", "Jojii S <jojii@gmx.net>"]
 description = "Interact with Bluetooth devices via RFCOMM channels"
 readme = "README.md"
 keywords = ["bluetooth", "RFCOMM", "SDP", "SPP"]
 license = "MIT"
 repository = "https://github.com/Dushistov/bluetooth-serial-port"
+
+[dependencies]
+async-std = "1.6.5"
 [dependencies.enum_primitive]
 version = "0.1"
 
@@ -34,8 +37,3 @@ version = "0.13.0"
 
 [features]
 test_without_hardware = []
-[badges.appveyor]
-repository = "Dushistov/bluetooth-serial-port"
-
-[badges.travis-ci]
-repository = "Dushistov/bluetooth-serial-port"

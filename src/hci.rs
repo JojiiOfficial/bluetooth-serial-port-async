@@ -1,28 +1,23 @@
 use super::{ffi::*, socket::create_error_from_last};
 
-use crate::bluetooth::{BtAddr, BtDevice, BtError};
+use crate::socket::{BtAddr, BtDevice, BtError};
 
-use libc::close;
-use std::{
-    ffi::CStr,
-    mem,
-    os::raw::*,
-    os::unix::{
-        io::{AsRawFd, FromRawFd, IntoRawFd},
-        net::UnixStream,
-    },
-    ptr, time, vec,
+use async_std::os::unix::{
+    io::{AsRawFd, FromRawFd, IntoRawFd},
+    net::UnixStream,
 };
+use libc::close;
+use std::{ffi::CStr, mem, os::raw::*, ptr, time, vec};
 
 #[repr(C, packed)]
 #[derive(Copy, Clone, Debug)]
 pub struct InquiryInfo {
     pub bdaddr: BtAddr,
-    pub pscan_rep_mode: uint8_t,
-    pub pscan_period_mode: uint8_t,
-    pub pscan_mode: uint8_t,
-    pub dev_class: [uint8_t; 3usize],
-    pub clock_offset: uint16_t,
+    pub pscan_rep_mode: Uint8T,
+    pub pscan_period_mode: Uint8T,
+    pub pscan_mode: Uint8T,
+    pub dev_class: [Uint8T; 3usize],
+    pub clock_offset: Uint16T,
 }
 
 impl Default for InquiryInfo {
