@@ -128,6 +128,11 @@ impl BtSocket {
         self.fd
     }
 
+    pub fn get_stream_std(&self) -> StdUnixStream {
+        let stream: StdUnixStream = unsafe { StdUnixStream::from_raw_fd(self.fd) };
+        stream
+    }
+
     pub fn get_stream(&self) -> UnixStream {
         let stream: UnixStream = unsafe { UnixStream::from_raw_fd(self.fd) };
         stream
