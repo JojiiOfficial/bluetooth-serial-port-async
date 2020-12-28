@@ -3,7 +3,7 @@ use super::{
     socket::{create_error_from_errno, create_error_from_last},
 };
 
-use crate::socket::{BtAddr, BtError};
+use crate::bluetooth::{BtAddr, BtError};
 
 use enum_primitive::{
     enum_from_primitive, enum_from_primitive_impl, enum_from_primitive_impl_ty, FromPrimitive,
@@ -21,7 +21,7 @@ struct sdp_session_t {
     state: c_int,
     local: c_int,
     flags: c_int,
-    tid: Uint16T,
+    tid: uint16_t,
     priv_: *mut c_void,
 }
 impl Default for sdp_session_t {
@@ -39,7 +39,7 @@ struct uuid_union_t {
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 struct uuid_t {
-    pub type_: Uint8T,
+    pub type_: uint8_t,
     pub value: uuid_union_t,
 }
 impl Default for uuid_t {
@@ -72,7 +72,7 @@ pub enum SdpAttrReqType {
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 struct sdp_record_t {
-    pub handle: Uint32T,
+    pub handle: uint32_t,
     pub pattern: *mut sdp_list_t,
     pub attrlist: *mut sdp_list_t,
     pub svclass: uuid_t,
@@ -90,7 +90,7 @@ struct sdp_val_union_t {
     _bindgen_data_: [u64; 3usize],
 }
 impl sdp_val_union_t {
-    unsafe fn uint8(&mut self) -> *mut Uint8T {
+    unsafe fn uint8(&mut self) -> *mut uint8_t {
         let raw: *mut u8 = &mut self._bindgen_data_ as *mut [u64; 3] as *mut u8;
         raw.offset(0)
     }
@@ -102,8 +102,8 @@ impl sdp_val_union_t {
 #[repr(C)]
 #[derive(Copy, Clone, Debug)]
 struct sdp_data_t {
-    dtd: Uint8T,
-    attr_id: Uint16T,
+    dtd: uint8_t,
+    attr_id: uint16_t,
     val: sdp_val_union_t,
     next: *mut sdp_data_t,
     unit_size: c_int,
@@ -171,9 +171,9 @@ enum SdpProtoUuid {
 #[cfg(target_os = "linux")]
 #[link(name = "bluetooth")]
 extern "C" {
-    fn sdp_connect(src: *const BtAddr, dst: *const BtAddr, flags: Uint32T) -> *mut sdp_session_t;
+    fn sdp_connect(src: *const BtAddr, dst: *const BtAddr, flags: uint32_t) -> *mut sdp_session_t;
 
-    fn sdp_uuid16_create(uuid: *mut uuid_t, data: Uint16T) -> *mut uuid_t;
+    fn sdp_uuid16_create(uuid: *mut uuid_t, data: uint16_t) -> *mut uuid_t;
     fn sdp_list_append(list: *mut sdp_list_t, d: *mut c_void) -> *mut sdp_list_t;
 
     fn sdp_service_search_attr_async(

@@ -8,13 +8,32 @@
     unused_qualifications
 )]
 
-mod ffi;
+mod bluetooth;
+pub use crate::bluetooth::*;
 
-mod hci;
-mod sdp;
-pub mod socket;
+// ////////////////////////////////////
+// Linux implementation of functions
+#[cfg(target_os = "linux")]
+mod linux;
 
-pub use self::{
-    hci::scan_devices,
-    socket::{BtAddr, BtProtocol, BtSocket, BtSocketConnect},
-};
+#[cfg(target_os = "windows")]
+#[allow(unused_variables)] // TODO: remove warnings
+mod windows;
+
+mod platform {
+
+    #[cfg(target_os = "linux")]
+    pub use crate::linux::*;
+
+    #[cfg(target_os = "windows")]
+    pub use crate::windows::*;
+}
+
+/// OS-specific functionality
+pub mod os {
+    /// Linux-specific definitions
+    #[cfg(target_os = "linux")]
+    pub mod linux {
+        pub use crate::linux::{BtSocket, BtSocketConnect};
+    }
+}
