@@ -13,7 +13,7 @@
 [package]
 edition = "2018"
 name = "bluetooth-serial-port-async"
-version = "0.6.2"
+version = "0.6.3"
 authors = ["Christopher James Halse Rogers <raof@ubuntu.com>", "kaegi <kaegi.dev@gmail.com>", "Evgeniy A. Dushistov <dushistov@mail.ru>", "Jojii S <jojii@gmx.net>"]
 description = "Interact with Bluetooth devices via RFCOMM channels"
 readme = "README.md"

@@ -1,5 +1,4 @@
 use async_std::os::unix::net::UnixStream;
-use std::os::unix::io::{FromRawFd, RawFd};
 use std::os::unix::net::UnixStream as StdUnixStream;
 use std::{
     io::{Read, Write},
@@ -138,7 +137,7 @@ impl Write for BtSocket {
 #[allow(missing_debug_implementations)] // `&mio::Evented` doesn't do `Debug`
 pub enum BtAsync<'a> {
     /// Caller needs to wait for the given `Evented` object to reach the given `Ready` state
-    WaitFor(&'a mio::Evented, mio::Ready),
+    WaitFor(&'a dyn mio::Evented, mio::Ready),
 
     /// Asynchronous transaction has completed
     Done,
@@ -184,6 +183,7 @@ pub enum BtError {
     IoError(std::io::Error),
 }
 
+#[allow(deprecated)]
 impl std::fmt::Display for BtError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{:}", std::error::Error::description(self))
@@ -196,7 +196,7 @@ impl std::error::Error for BtError {
             BtError::Unknown => "Unknown Bluetooth Error",
             BtError::Errno(_, ref message) => message.as_str(),
             BtError::Desc(ref message) => message.as_str(),
-            BtError::IoError(ref err) => err.description(),
+            BtError::IoError(_) => "io error",
         }
     }
 }

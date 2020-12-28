@@ -6,10 +6,7 @@ use mio::{unix::EventedFd, Poll, Ready};
 use std::os::unix::io::{FromRawFd, RawFd};
 use std::os::unix::net::UnixStream as StdUnixStream;
 
-use async_std::prelude::Stream;
-
 use std::{
-    error::Error,
     io::{Read, Write},
     mem,
 };
@@ -18,9 +15,10 @@ pub fn create_error_from_errno(message: &str, errno: i32) -> BtError {
     let nix_error = nix::Error::from_errno(nix::errno::from_i32(errno));
     BtError::Errno(
         errno as u32,
-        format!("{:}: {:}", message, nix_error.description()),
+        format!("{:}: {:}", message, nix_error.to_string()),
     )
 }
+
 pub fn create_error_from_last(message: &str) -> BtError {
     create_error_from_errno(message, nix::errno::errno())
 }
@@ -110,10 +108,7 @@ impl BtSocket {
 
 impl From<nix::Error> for BtError {
     fn from(e: nix::Error) -> BtError {
-        BtError::Errno(
-            e.as_errno().map(|x| x as u32).unwrap_or(0),
-            e.description().to_string(),
-        )
+        BtError::Errno(e.as_errno().map(|x| x as u32).unwrap_or(0), e.to_string())
     }
 }
 
