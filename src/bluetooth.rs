@@ -324,7 +324,7 @@ mod tests {
     use super::*;
     use std::str::FromStr;
 
-    #[test()]
+    #[test]
     fn btaddr_from_string() {
         match BtAddr::from_str("00:00:00:00:00:00") {
             Ok(addr) => assert_eq!(addr, BtAddr([0u8; 6])),
@@ -346,13 +346,13 @@ mod tests {
         }
     }
 
-    #[test()]
+    #[test]
     fn btaddr_to_string() {
         assert_eq!(BtAddr::any().to_string(), "00:00:00:00:00:00");
         assert_eq!(BtAddr([1, 2, 3, 4, 5, 6]).to_string(), "01:02:03:04:05:06");
     }
 
-    #[test()]
+    #[test]
     fn btaddr_roundtrips_to_from_str() {
         let addr = BtAddr([0, 22, 4, 1, 33, 192]);
         let addr_string = "00:ff:ee:ee:dd:12";
@@ -364,13 +364,13 @@ mod tests {
     }
 
     #[cfg(not(feature = "test_without_hardware"))]
-    #[test()]
+    #[test]
     fn creates_rfcomm_socket() {
         BtSocket::new(BtProtocol::RFCOMM).unwrap();
     }
 
     #[cfg(not(feature = "test_without_hardware"))]
-    #[test()]
+    #[test]
     fn scans_devices() {
         scan_devices(time::Duration::from_secs(20)).unwrap();
     }

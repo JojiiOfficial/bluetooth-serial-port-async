@@ -21,9 +21,15 @@ keywords = ["bluetooth", "RFCOMM", "SDP", "SPP"]
 license = "MIT"
 repository = "https://github.com/JojiiOfficial/bluetooth-serial-port-async"
 
+[features]
+# Feature to disable any tests which rely on hardware availability
+# eg: tests which attempt to create a BtSocket.
+test_without_hardware = []
+
 [dependencies]
 async-std = "1.8.0"
 enum_primitive = "0.1.1"
 libc = "0.2.81"
 mio = "0.6.0"
 nix = "0.19.1"
+itertools = "0.10.0"
