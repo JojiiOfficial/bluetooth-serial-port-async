@@ -4,6 +4,7 @@ use super::{
 };
 
 use crate::bluetooth::{BtAddr, BtError};
+use itertools::Itertools;
 
 use enum_primitive::{
     enum_from_primitive, enum_from_primitive_impl, enum_from_primitive_impl_ty, FromPrimitive,
@@ -12,6 +13,7 @@ use std::{
     mem,
     os::{raw::*, unix},
     ptr, slice,
+    str::FromStr,
 };
 
 #[repr(C)]
@@ -31,13 +33,13 @@ impl Default for sdp_session_t {
 }
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 struct uuid_union_t {
     _bindgen_data_: [u32; 4usize],
 }
 
 #[repr(C)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 struct uuid_t {
     pub type_: uint8_t,
     pub value: uuid_union_t,
@@ -45,6 +47,41 @@ struct uuid_t {
 impl Default for uuid_t {
     fn default() -> Self {
         unsafe { mem::zeroed() }
+    }
+}
+impl FromStr for uuid_t {
+    type Err = std::num::ParseIntError;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let out = s
+            .split('-')
+            .flat_map(str::chars)
+            .chunks(8)
+            .into_iter()
+            .map(|c| u32::from_str_radix(c.collect::<String>().as_ref(), 16))
+            .collect::<Result<Vec<_>, std::num::ParseIntError>>()?;
+        Ok(Self {
+            type_: 25,
+            value: uuid_union_t {
+                _bindgen_data_: [out[0], out[1], out[2], out[3]],
+            },
+        })
+    }
+}
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn uuid_t_from_str() {
+        let uuid_t_test = uuid_t {
+            type_: 25,
+            value: uuid_union_t {
+                _bindgen_data_: [4354, 4096, 2147483776, 1604007165],
+            },
+        };
+        assert_eq!(
+            uuid_t_test,
+            "00001102-0000-1000-8000-00805f9b34fd".parse().unwrap()
+        );
     }
 }
 
@@ -173,9 +210,9 @@ enum SdpProtoUuid {
 extern "C" {
     fn sdp_connect(src: *const BtAddr, dst: *const BtAddr, flags: uint32_t) -> *mut sdp_session_t;
 
-    fn sdp_uuid16_create(uuid: *mut uuid_t, data: uint16_t) -> *mut uuid_t;
     fn sdp_list_append(list: *mut sdp_list_t, d: *mut c_void) -> *mut sdp_list_t;
 
+    fn sdp_uuid16_create(uuid: *mut uuid_t, data: uint16_t) -> *mut uuid_t;
     fn sdp_service_search_attr_async(
         session: *mut sdp_session_t,
         search: *const sdp_list_t,
