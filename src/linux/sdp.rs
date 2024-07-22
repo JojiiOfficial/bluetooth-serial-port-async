@@ -425,7 +425,7 @@ impl QueryRFCOMMChannel {
                 assert!(!self.session.is_null());
                 unsafe { (*self.session).sock }
             }};
-        };
+        }
 
         match self.state {
             QueryRFCOMMChannelState::New => {

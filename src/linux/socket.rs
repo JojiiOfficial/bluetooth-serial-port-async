@@ -1,10 +1,14 @@
 use super::sdp::{QueryRFCOMMChannel, QueryRFCOMMChannelStatus};
 use crate::bluetooth::{BtAddr, BtAsync, BtError, BtProtocol};
-use async_std::os::unix::net::UnixStream;
 use mio::{unix::EventedFd, Poll, Ready};
-
 use std::os::unix::io::{FromRawFd, RawFd};
 use std::os::unix::net::UnixStream as StdUnixStream;
+
+#[cfg(feature="tokio")]
+use tokio::net::UnixStream as UnixStream;
+
+#[cfg(feature="async_std")]
+use async_std::os::unix::net::UnixStream as UnixStream;
 
 use std::{
     io::{Read, Write},
@@ -100,6 +104,12 @@ impl BtSocket {
         stream
     }
 
+    #[cfg(feature="tokio")]
+    pub fn get_stream(&self) -> UnixStream {
+        UnixStream::from_std(self.get_stream_std()).unwrap()
+    }
+
+    #[cfg(feature="async_std")]
     pub fn get_stream(&self) -> UnixStream {
         let stream: UnixStream = unsafe { UnixStream::from_raw_fd(self.fd) };
         stream

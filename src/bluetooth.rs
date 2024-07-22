@@ -1,9 +1,14 @@
-use async_std::os::unix::net::UnixStream;
 use std::os::unix::net::UnixStream as StdUnixStream;
 use std::{
     io::{Read, Write},
     str, time,
 };
+
+#[cfg(feature="tokio")]
+use tokio::net::UnixStream as UnixStream;
+
+#[cfg(feature="async_std")]
+use async_std::os::unix::net::UnixStream as UnixStream;
 
 use crate::platform;
 

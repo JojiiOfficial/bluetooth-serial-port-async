@@ -11,6 +11,9 @@
 mod bluetooth;
 pub use crate::bluetooth::*;
 
+#[cfg(all(feature = "async_std", feature = "tokio"))]
+compile_error!("feature \"async_std\" and feature \"tokio\" cannot be enabled at the same time");
+
 // ////////////////////////////////////
 // Linux implementation of functions
 #[cfg(target_os = "linux")]

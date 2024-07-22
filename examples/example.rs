@@ -1,13 +1,24 @@
+#[cfg(feature="async_std")]
 use async_std::io::prelude::*;
-use bluetooth_serial_port_async::{BtProtocol, BtSocket};
-use std::time;
 
+#[cfg(feature="tokio")]
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+use bluetooth_serial_port_async::{BtProtocol, BtSocket};
+
+#[cfg(feature="async_std")]
 fn main() {
     async_std::task::block_on(run());
 }
 
+#[cfg(feature="tokio")]
+#[tokio::main]
+async fn main() {
+    run().await
+}
+
 async fn run() {
-    let devices = bluetooth_serial_port_async::scan_devices(time::Duration::from_secs(20)).unwrap();
+    let devices = bluetooth_serial_port_async::scan_devices(std::time::Duration::from_secs(20)).unwrap();
     if devices.len() == 0 {
         panic!("No devices found");
     }
@@ -25,9 +36,9 @@ async fn run() {
     // create and connect the RFCOMM socket
     let mut socket = BtSocket::new(BtProtocol::RFCOMM).unwrap();
     socket.connect(device.addr).unwrap();
-
-    // BtSocket implements the `Read` and `Write` traits (they're blocking)
+    
     let mut buffer = [0; 10];
+    // BtSocket::get_stream returns an async stream
     let mut stream = socket.get_stream();
     let num_bytes_read = stream.read(&mut buffer[..]).await.unwrap();
     let num_bytes_written = stream.write(&buffer[0..num_bytes_read]).await.unwrap();

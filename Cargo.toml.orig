@@ -23,4 +23,3 @@ test_without_hardware = []
 [badges]
 travis-ci = { repository = "Dushistov/bluetooth-serial-port" }
 appveyor = { repository = "Dushistov/bluetooth-serial-port" }
-
